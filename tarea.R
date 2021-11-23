@@ -42,7 +42,7 @@ portfolio <- function(
   ##### Others Options
   
   if (is.null(rf)) {
-    rf = 0.05
+    rf = 0.0012
   }
   if (is.null(nportfolios)){
     nportfolios = 100000
@@ -122,7 +122,7 @@ portfolio <- function(
   
   max_sr <- portfolio_values[which.max(portfolio_values$SharpeRatio), ]
   
-  p1 <- max_sr %>%
+  max_plot <- max_sr %>%
     gather(stocks, key = Asset,
            value = Weights) %>%
     mutate(Asset = as.factor(Asset)) %>%
@@ -132,7 +132,69 @@ portfolio <- function(
     labs(x = 'Assets', y = 'Weights', title = "Tangency Portfolio Weights") +
     scale_y_continuous(labels = scales::percent) 
   
-  #plotly::ggplotly(p1)
+  min_var_plot <- min_var %>%
+    gather(stocks, key = Asset,
+           value = Weights) %>%
+    mutate(Asset = as.factor(Asset)) %>%
+    ggplot(aes(x = fct_reorder(Asset,Weights), y = Weights, fill = Asset)) +
+    geom_bar(stat = 'identity') +
+    theme_minimal() +
+    labs(x = 'Assets', y = 'Weights', title = "Minimum Variance Portfolio Weights") +
+    scale_y_continuous(labels = scales::percent) 
+  
+  efficent_frontier <- portfolio_values %>%
+    ggplot(aes(x = Risk, y = Return, color = SharpeRatio)) +
+    geom_point() +
+    theme_classic() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent) +
+    labs(x = 'Annualized Risk',
+         y = 'Annualized Returns',
+         title = "Portfolio Optimization & Efficient Frontier") +
+    geom_point(aes(x = Risk,
+                   y = Return), data = min_var, color = 'orange') +
+    geom_point(aes(x = Risk,
+                   y = Return), data = max_sr, color = 'red') +
+    annotate('text', x = 0.15, y = 0.17, label = "Tangency Portfolio", 
+             color = 'red') +
+    annotate('text', x = 0.15, y = 0.08, label = "Minimum variance portfolio",
+             color = 'orange') 
+  
+  q <- portfolio_values %>%
+    ggplot(aes(x = Risk, y = Return, color = SharpeRatio)) +
+    geom_point() +
+    theme_classic() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent) +
+    labs(x = 'Annualized Risk',
+         y = 'Annualized Returns',
+         title = "Portfolio Optimization & Efficient Frontier")+
+    geom_point(aes(x = Risk,
+                   y = Return), data = max_sr, color = 'red', size =2)
+  
+  q <- q + geom_abline(intercept = rf, slope = max(portfolio_values$SharpeRatio), color="red", 
+                       linetype="dashed", size=1)
+  
+  r <- portfolio_values %>%
+    ggplot(aes(x = Risk, y = Return, color = SharpeRatio)) +
+    geom_point() +
+    theme_classic() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent) +
+    labs(x = 'Annualized Risk',
+         y = 'Annualized Returns',
+         title = "Portfolio Optimization & Efficient Frontier")+
+    geom_point(aes(x = Risk,
+                   y = Return), data = max_sr, color = 'red', size =2)+
+    xlim(0,0.25)+
+    ylim(0,0.2)
+  
+  
+  r <- r + geom_abline(intercept = rf, slope = max(portfolio_values$SharpeRatio),
+                       color="red", 
+                       linetype="dashed", size=1)
+  
+  plots <- (max_plot + min_var_plot) / efficent_frontier
   
   min_var <- as.tibble(min_var)
   
@@ -140,10 +202,10 @@ portfolio <- function(
   
   max_sr <- as.tibble(max_sr)
   
-  respuestas <- list(pregunta_6 = portfolio_values ,pregunta_7 = min_var, pregunta_8 = max_sr, pregunta_9 = p1 )
+  respuestas <- list(pregunta_6 = portfolio_values ,pregunta_7 = min_var, pregunta_8 = max_sr, pregunta_9 = plots, pregunta_9a = q)
   
   return(respuestas)
 }
 
 a <- portfolio(stocks=acciones)
-
+a
