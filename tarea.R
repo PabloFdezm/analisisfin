@@ -3,8 +3,7 @@ library(tidyverse)
 library(tidyquant)
 library(quantmod)
 library(patchwork)
-library(AER)
-library(tidyr)
+
 
 ##### Others
 acciones <- c("AAPL", "GOOG", "NFLX", "AMZN")
