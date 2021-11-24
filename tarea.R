@@ -153,49 +153,13 @@ portfolio <- function(
     scale_x_continuous(labels = scales::percent) +
     labs(x = 'Annualized Risk',
          y = 'Annualized Returns',
-         title = "Portfolio Optimization & Efficient Frontier") +
-    geom_point(aes(x = Risk,
-                   y = Return), data = min_var, color = 'orange') +
-    geom_point(aes(x = Risk,
-                   y = Return), data = max_sr, color = 'red') +
-    annotate('text', x = 0.15, y = 0.17, label = "Tangency Portfolio", 
-             color = 'red') +
-    annotate('text', x = 0.15, y = 0.08, label = "Minimum variance portfolio",
-             color = 'orange') 
-  
-  q <- portfolio_values %>%
-    ggplot(aes(x = Risk, y = Return, color = SharpeRatio)) +
-    geom_point() +
-    theme_classic() +
-    scale_y_continuous(labels = scales::percent) +
-    scale_x_continuous(labels = scales::percent) +
-    labs(x = 'Annualized Risk',
-         y = 'Annualized Returns',
          title = "Portfolio Optimization & Efficient Frontier")+
     geom_point(aes(x = Risk,
                    y = Return), data = max_sr, color = 'red', size =2)
   
-  q <- q + geom_abline(intercept = rf, slope = max(portfolio_values$SharpeRatio), color="red", 
+  efficent_frontier <- efficent_frontier + geom_abline(intercept = rf, slope = max(portfolio_values$SharpeRatio), color="red", 
                        linetype="dashed", size=1)
   
-  r <- portfolio_values %>%
-    ggplot(aes(x = Risk, y = Return, color = SharpeRatio)) +
-    geom_point() +
-    theme_classic() +
-    scale_y_continuous(labels = scales::percent) +
-    scale_x_continuous(labels = scales::percent) +
-    labs(x = 'Annualized Risk',
-         y = 'Annualized Returns',
-         title = "Portfolio Optimization & Efficient Frontier")+
-    geom_point(aes(x = Risk,
-                   y = Return), data = max_sr, color = 'red', size =2)+
-    xlim(0,0.25)+
-    ylim(0,0.2)
-  
-  
-  r <- r + geom_abline(intercept = rf, slope = max(portfolio_values$SharpeRatio),
-                       color="red", 
-                       linetype="dashed", size=1)
   
   plots <- (max_plot + min_var_plot) / efficent_frontier
   
@@ -205,7 +169,14 @@ portfolio <- function(
   
   max_sr <- as.tibble(max_sr)
   
-  respuestas <- list(pregunta_6 = portfolio_values ,pregunta_7 = min_var, pregunta_8 = max_sr, pregunta_9 = plots, pregunta_9a = q)
+  monto_inicial = 10000
+  
+  
+  
+  respuestas <- list(pregunta_6 = portfolio_values,
+                     pregunta_7 = min_var, 
+                     pregunta_8 = max_sr, 
+                     pregunta_9 = plots)
   
   return(respuestas)
 }
