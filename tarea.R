@@ -45,6 +45,7 @@ portfolio <- function(
   if (is.null(rf)) {
    rf <- tail(na.locf(tq_get("^TNX", get="stock.prices",
                               complete_cases = TRUE, from= Sys.Date()-365*5, to=Sys.Date()-2)),1)
+        rf <-rf$adjusted/100
   }
   if (is.null(nportfolios)){
     nportfolios = 100000
