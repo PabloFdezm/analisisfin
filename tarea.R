@@ -3,7 +3,7 @@ library(tidyverse)
 library(tidyquant)
 library(quantmod)
 library(patchwork)
-
+library(PerformanceAnalytics)
 
 ##### Others
 acciones <- c("AAPL", "GOOG", "NFLX", "AMZN")
@@ -171,15 +171,49 @@ portfolio <- function(
   
   monto_inicial = 10000
   
+  returns <- log_ret_wider + 1
   
+  nstocks <- length(stocks) + 1
   
-  respuestas <- list(pregunta_6 = portfolio_values,
-                     pregunta_7 = min_var, 
+  returns[1,2:nstocks] <- as.numeric(max_sr[,1:(nstocks-1)]*monto_inicial)
+  
+  returns_longer <- returns %>% pivot_longer(-date, names_to = 'symbol', values_to = 'ret') %>%
+    group_by(symbol)%>%
+    arrange(symbol) %>%
+    mutate(ret_acum =cumprod(ret))
+  
+  returns_wide <- returns_longer %>%
+    ungroup() %>%
+    select(date,symbol, ret_acum) %>%
+    pivot_wider(names_from = symbol, values_from = ret_acum)
+  
+  returns_wide$portfolio <- apply(returns_wide[2:nstocks], 1, sum)
+  
+  returns_longer2 <- returns_wide %>%
+    pivot_longer(-date, names_to = 'symbol', values_to = 'ret') %>%
+    group_by(symbol) %>%
+    arrange(symbol)
+  
+  portfolio <- returns_longer2 %>%
+    ungroup() %>%
+    filter(symbol == 'portfolio') %>%
+    ggplot()+
+    geom_line(aes(date,ret,color=symbol))+
+    labs(x='',
+         y='')+
+    tidyquant::theme_tq()
+  
+  respuestas <- list(pregunta_7 = min_var, 
                      pregunta_8 = max_sr, 
-                     pregunta_9 = plots)
+                     pregunta_9 = plots,
+                     pregunta_10 = portfolio
+                     )
   
   return(respuestas)
 }
 
 a <- portfolio(stocks=acciones)
 a
+
+
+
