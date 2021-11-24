@@ -6,7 +6,7 @@ library(patchwork)
 library(PerformanceAnalytics)
 
 ##### Others
-acciones <- c("AAPL", "GOOG", "NFLX", "AMZN")
+acciones <- c("AAPL", "GOOG", "NFLX", "AMZN", "FB", 'NVDA', "DIS", "JPM")
 
 datos_descargados <-  acciones %>% tq_get(get  = "stock.prices",
                                           from = "2016-10-31",
