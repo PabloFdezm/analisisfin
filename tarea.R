@@ -198,22 +198,36 @@ portfolio <- function(
     ungroup() %>%
     filter(symbol == 'portfolio') %>%
     ggplot()+
-    geom_line(aes(date,ret,color=symbol))+
+    geom_line(aes(date,ret))+
     labs(x='',
-         y='')+
+         y='',
+         title = 'Retorno del Portfolio de Max. Sharpe Ratio',
+         subtitle = 'Portfolio Completo')+
+    tidyquant::theme_tq()
+  
+  portfolio2 <- returns_longer2 %>%
+    ungroup() %>%
+    filter(symbol != 'portfolio') %>%
+    ggplot()+
+    geom_line(aes(date,ret, color= symbol))+
+    labs(x='',
+         y='',
+         title = 'Retorno del Portfolio de Max. Sharpe Ratio',
+         subtitle = 'Composicion del portfolio')+
     tidyquant::theme_tq()
   
   respuestas <- list(pregunta_7 = min_var, 
                      pregunta_8 = max_sr, 
                      pregunta_9 = plots,
-                     pregunta_10 = portfolio
+                     pregunta_10a = portfolio,
+                     pregunta_10b = portfolio2
                      )
   
   return(respuestas)
 }
 
-a <- portfolio(stocks=acciones)
-a
+tarea1 <- portfolio(stocks=acciones)
+tarea1
 
 
 
